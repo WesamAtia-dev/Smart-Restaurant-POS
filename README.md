@@ -1,3 +1,6 @@
+## 🗺️ Project Architecture Diagram
+![POS System Structure](POS%20System.drawio.png)
+
 # 🛒 Smart Restaurant POS System
 
 This project is a sophisticated Point of Sale (POS) system developed in **C#**, focusing on the application of **Object-Oriented Programming (OOP)** principles to ensure code robustness, maintainability, and scalability. The system automates the restaurant workflow from item selection and dynamic pricing to final invoice generation and payment processing.
@@ -39,11 +42,11 @@ The system architecture is built according to the project's structural diagram. 
 
 ---
 
-## 🛠️ Key Technical Features
+## 🛠️ Key Technical Features (V2 Upgrades)
 
-*   **🛡️ Robustness (Validation):** Implements input validation (e.g., `TryParse`) and logical constraints (e.g., restricting discounts to 0-100%) to prevent runtime crashes.
-*   **💾 Data Persistence (File I/O):** Supports exporting final invoices to text files (`.txt`) for digital record-keeping and archiving.
-*   **🧩 Add-on System:** A flexible system that allows optional components for each order with real-time price updates.
+* **🛡️ Advanced Robustness & Custom Exceptions:** Built a secondary defensive layer across the architecture. Implemented rigid field-level validation within properties (e.g., throwing `ArgumentException` and `ArgumentOutOfRangeException` for invalid product parameters) coupled with high-level dynamic handling in the `Main` thread to block runtime anomalies without crashing the engine.
+* **💾 Fault-Tolerant Data Persistence (File I/O):** Reinforced the invoice export module with specialized OS-level safeguards (`try-catch`), intercepting `IOException` and `UnauthorizedAccessException` to ensure predictable system response under failure scenarios.
+* **🧩 Dynamic Component Management:** Formulated automated math layers to calculate complex, multi-tiered invoices—integrating layered variables seamlessly (Nutritional/Calorie density surcharges, nested add-on prices, structured discounts, global static taxes, and localized service charges).
 
 ---
 
