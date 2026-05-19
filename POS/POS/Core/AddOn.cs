@@ -12,8 +12,29 @@ namespace POS.Core
 
 	class AddOn
 	{
-		public string Name { get; set; }
-		public double Price { get; set; }
+		private string name;
+        private double price;	
+
+        public string Name 
+		{
+			get { return name; }
+			set
+			{
+				if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Add-on name cannot be empty.");
+                name = value;
+            }
+        }
+		public double Price 
+		{
+			get { return price; }
+			set
+			{
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException("Add-on price cannot be negative.");
+                price = value;
+            }
+        }
 
 		public AddOn(string name, double price)
 		{

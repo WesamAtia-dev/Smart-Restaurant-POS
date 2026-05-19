@@ -15,8 +15,29 @@ namespace POS.Order
 
 	class OrderItem
 	{
-		public Product Product { get; set; }
-		public int Quantity { get; set; }
+		private Product product;
+		private int quantity;
+		public Product Product 
+		{ 
+			get { return product; }
+			set
+			{
+				if(value == null)
+					throw new ArgumentNullException("Product cannot be null.");
+				product = value;
+			}
+        }
+		public int Quantity
+		{
+			get { return quantity; }
+			set
+			{
+
+				if(value <= 0)
+					throw new ArgumentOutOfRangeException("Quantity must be greater than zero.");
+				quantity = value;
+			}
+		}
 		public List<AddOn> AddOns { get; set; }
 
 		public OrderItem(Product product, int quantity)
@@ -29,9 +50,11 @@ namespace POS.Order
 
 		public void AddAddOn(AddOn addOn)
 		{
-			// TODO
-			AddOns.Add(addOn);			
-		}
+			// TODO						
+			if(addOn == null)
+                throw new ArgumentNullException("Add-on cannot be null.");
+            AddOns.Add(addOn);
+        }
 
 		public double GetAddOnsTotalPerProduct()
 		{

@@ -13,17 +13,38 @@ namespace POS.Core
 
 	abstract class Product
 	{
-		public string Name { get; set; }
-		public double Price { get; set; }
+		private string name;
+        private double price;
+
+        public string Name 
+		{ 
+			get { return name; }
+			set
+			{
+				if(string.IsNullOrWhiteSpace(value))
+                    // throw Exception: Custom Exception
+                    throw new ArgumentException("Product name cannot be empty.");
+				name = value;
+            }
+		}
+		public double Price 
+		{
+			get { return price; }
+			set
+			{
+				if(value < 0)
+                    // throw Exception: Custom Exception
+                    throw new ArgumentOutOfRangeException("Price cannot be negative.");
+                price = value;
+			}
+        }
 		public Category Category { get; set; }
 
 		public Product(string name, double price, Category category)
 		{
 			// TODO:
 			this.Name = name;
-
-			if(price<0)
-				throw new ArgumentOutOfRangeException("Price cannot be negative.");
+			
 			this.Price = price;
 
 			this.Category = category;						

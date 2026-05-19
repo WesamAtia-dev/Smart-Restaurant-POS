@@ -25,7 +25,7 @@ class Program
             new AddOn("Jalapenos", 0.150),
             new AddOn("Ice Cubes", 0.000),
             new AddOn("Whipped Cream", 0.200)
-        };
+        }; 
 
 		Order currentOrder = new Order();
 		bool running = true;
@@ -44,50 +44,70 @@ class Program
 			Console.Write("Choose an option: ");
 			string option = Console.ReadLine();
 
-			switch (option)
+			try
 			{
-				case "1":
-                    // TODO
-                    ShowMenu(menu);
-                    break;
 
-				case "2":
-                    // TODO
-                    AddItemToOrder(menu, availableAddOns, currentOrder);
-                    break;
+				switch (option)
+				{
+					case "1":
+						// TODO
+						ShowMenu(menu);
+						break;
 
-				case "3":
-                    // TODO
-                    currentOrder.ViewCurrentOrder();
-                    break;
+					case "2":
+						// TODO
+						AddItemToOrder(menu, availableAddOns, currentOrder);
+						break;
 
-				case "4":
-                    // TODO
-                    UpdateItemQuantity(currentOrder);
-                    break;
+					case "3":
+						// TODO
+						currentOrder.ViewCurrentOrder();
+						break;
 
-				case "5":
-                    // TODO
-                    RemoveItemFromOrder(currentOrder);
-                    break;
+					case "4":
+						// TODO
+						UpdateItemQuantity(currentOrder);
+						break;
 
-				case "6":
-                    // TODO
-                    ApplyDiscount(currentOrder);
-                    break;
+					case "5":
+						// TODO
+						RemoveItemFromOrder(currentOrder);
+						break;
 
-				case "7":
-                    // TODO
-                    Checkout(currentOrder);
-                    // After successfully completing the payment, terminate the program
-                    running = false;
-					break;
+					case "6":
+						// TODO
+						ApplyDiscount(currentOrder);
+						break;
 
-				default:
-					Console.WriteLine("Invalid option. Please try again.");
-					break;
+					case "7":
+						// TODO
+						Checkout(currentOrder);
+						// After successfully completing the payment, terminate the program
+						running = false;
+						break;
+
+					default:
+						Console.WriteLine("Invalid option. Please try again.");
+						break;
+				}
 			}
-		}
+			catch (ArgumentOutOfRangeException ex)
+			{ 
+				Console.WriteLine($"\n[Input Error] {ex.Message}"); 
+			}
+			catch (ArgumentException ex)
+            {
+                Console.WriteLine($"\n[Input Error] {ex.Message}");
+            }
+			catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"\n[Operation Error] {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n[Unexpected Error] {ex.Message}");
+            }
+        }
 
 		Console.WriteLine();
         Console.WriteLine("Thank you for using Smart POS System. Visit us again!");
@@ -147,7 +167,7 @@ class Program
 		Console.Write("Do you want to add add-ons? (y/n): ");
 		string addOnChoice = Console.ReadLine();
 
-		if (addOnChoice.ToLower() == "y")
+		if (addOnChoice.Trim().ToLower() == "y")
 		{
 			bool addingAddOns = true;
 
@@ -172,7 +192,7 @@ class Program
 				Console.Write("Do you want to add another add-on? (y/n): ");
 				string anotherAddOn = Console.ReadLine();
 
-				if (anotherAddOn.ToLower() != "y")
+				if (anotherAddOn.Trim().ToLower() != "y")
 				{
 					addingAddOns = false;
 				}
@@ -269,51 +289,72 @@ class Program
 			Console.Write("Enter your choice: ");
 			string paymentChoice = Console.ReadLine();
 
-			if (paymentChoice == "1")
+			// Payment Errors
+			try
 			{
-				Console.Write("Enter cash received: ");
-				double cashReceived;
-
-				if (double.TryParse(Console.ReadLine(), out cashReceived))
+				if (paymentChoice == "1")
 				{
-					CashPayment cashPayment = new CashPayment(cashReceived);
+					Console.Write("Enter cash received: ");
+					double cashReceived;
 
-					if (cashPayment.Pay(finalTotal))
+					if (double.TryParse(Console.ReadLine(), out cashReceived))
 					{
-						order.PaymentMethod = cashPayment;
+						CashPayment cashPayment = new CashPayment(cashReceived);
+
+						if (cashPayment.Pay(finalTotal))
+						{
+							order.PaymentMethod = cashPayment;
+							paymentSuccess = true;
+						}
+						else
+						{
+							Console.WriteLine("Cash amount is not enough.");
+						}
+					}
+					else
+					{
+						Console.WriteLine("Invalid cash amount.");
+					}
+				}
+				else if (paymentChoice == "2")
+				{
+					Console.Write("Enter card number: ");
+					string cardNumber = Console.ReadLine();
+
+					CardPayment cardPayment = new CardPayment(cardNumber);
+
+					if (cardPayment.Pay(finalTotal))
+					{
+						order.PaymentMethod = cardPayment;
 						paymentSuccess = true;
 					}
 					else
 					{
-						Console.WriteLine("Cash amount is not enough.");
+						Console.WriteLine("Invalid card number.");
 					}
 				}
 				else
 				{
-					Console.WriteLine("Invalid cash amount.");
+					Console.WriteLine("Invalid payment option.");
 				}
 			}
-			else if (paymentChoice == "2")
+			//catch (ArgumentOutOfRangeException ex)
+   //         {
+   //             Console.WriteLine($"\n[Payment Error] {ex.Message}");
+   //         }            
+			//catch (ArgumentException ex)
+   //         {
+   //             Console.WriteLine($"\n[Payment Error] {ex.Message}");
+   //         }
+   //         catch (InvalidOperationException ex)
+   //         {
+   //             Console.WriteLine($"\n[Payment Error] {ex.Message}");
+   //         }
+			catch (Exception ex)
 			{
-				Console.Write("Enter card number: ");
-				string cardNumber = Console.ReadLine();
+				Console.WriteLine($"\n[Payment Error] {ex.Message}");
+            }
 
-				CardPayment cardPayment = new CardPayment(cardNumber);
-
-				if (cardPayment.Pay(finalTotal))
-				{
-					order.PaymentMethod = cardPayment;
-					paymentSuccess = true;
-				}
-				else
-				{
-					Console.WriteLine("Invalid card number.");
-				}
-			}
-			else
-			{
-				Console.WriteLine("Invalid payment option.");
-			}
 		}
 
 		order.PrintInvoice();
@@ -321,7 +362,7 @@ class Program
 		Console.Write("Do you want to save the invoice to a text file? (y/n): ");
 		string saveChoice = Console.ReadLine();
 
-		if (saveChoice.ToLower() == "y")
+		if (saveChoice.Trim().ToLower() == "y")
 		{
 			Console.Write("Enter file name (example: invoice.txt): ");
 			string fileName = Console.ReadLine();
@@ -331,8 +372,7 @@ class Program
 				fileName = "invoice.txt";
 			}
 
-			order.SaveInvoiceToFile(fileName);
-			Console.WriteLine($"Invoice saved successfully to: {fileName}");
+			order.SaveInvoiceToFile(fileName);			
 		}
 	}
 }

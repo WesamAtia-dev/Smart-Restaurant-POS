@@ -12,7 +12,8 @@ namespace POS.Core
 
 	class Drink : Product
 	{
-		public bool IsCold { get; set; }
+        // IsCold: bool value can't store wrong data, so no need for validation (Exception) in the setter.
+        public bool IsCold { get; set; }
 
 		public Drink(string name, double price, bool isCold)
 			: base(name, price, Category.Drink)

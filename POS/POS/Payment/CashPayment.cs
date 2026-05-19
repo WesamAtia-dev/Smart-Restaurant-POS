@@ -20,16 +20,23 @@ namespace POS.Payment
 		public CashPayment(double cashReceived)
 		{
 			// TODO
+			if (cashReceived <= 0)
+				throw new ArgumentOutOfRangeException("Cash received must be greater than zero.");
+
 			this.CashReceived = cashReceived;
 		}
 
 		public bool Pay(double amount)
 		{
             // TODO:
-            if (CashReceived < amount)
+			if(amount <= 0)
+			{
+				throw new ArgumentOutOfRangeException("Payment amount must be greater than zero.");
+			}
+            
+			if (CashReceived < amount)
             {
-                Console.WriteLine($"Insufficient cash. You need {amount - CashReceived:F3} KD more.");
-                return false;
+				throw new InvalidOperationException($"Insufficient cash. You need {amount - CashReceived:F3} KD more.");
             }
 
             Change = CashReceived - amount;

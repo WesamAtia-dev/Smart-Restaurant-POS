@@ -13,9 +13,19 @@ namespace POS.Order
 	// Order class
 	class Order
 	{
-		public List<OrderItem> Items { get; set; }
+		private double discountPercent;
+        public List<OrderItem> Items { get; set; }
 		public IPaymentMethod PaymentMethod { get; set; }
-		public double DiscountPercent { get; set; }
+		public double DiscountPercent
+		{
+			get { return discountPercent; }
+			set
+			{
+				if(value < 0 || value > 100)
+                    throw new ArgumentOutOfRangeException("Discount percent must be between 0 and 100.");
+				discountPercent = value;
+            }
+		}
 		public Order()
 		{
 			// TODO
@@ -26,6 +36,10 @@ namespace POS.Order
 		public void AddItem(OrderItem item)
 		{
 			// TODO
+			if (item == null)
+            {
+                throw new ArgumentNullException("Cannot add a null item to the order.");
+            }
 			Items.Add(item);
 		}
 
@@ -64,35 +78,39 @@ namespace POS.Order
 		public void RemoveItem(int itemNumber)
 		{
             // TODO
+			if(itemNumber < 1 || itemNumber > Items.Count)
+            {
+                throw new ArgumentOutOfRangeException("Invalid item number.");                
+            }
+
             
-            if (itemNumber >= 1 && itemNumber <= Items.Count)
-            {
-                // itemNumber starts from 1 for the user, but list index starts from 0, so we need to subtract 1
-                Items.RemoveAt(itemNumber - 1);
-                Console.WriteLine("Item removed successfully.");
-            }
-            else
-            {
-                Console.WriteLine("Invalid item number.");
-            }
+            // itemNumber starts from 1 for the user, but list index starts from 0, so we need to subtract 1
+            Items.RemoveAt(itemNumber - 1);
+            Console.WriteLine("Item removed successfully.");
+            
         }
 
 		public void UpdateQuantity(int itemNumber, int newQuantity)
 		{
             // TODO
-            if (itemNumber >= 1 && itemNumber <= Items.Count)
+            if (itemNumber < 1 || itemNumber > Items.Count)
             {
-                if (newQuantity > 0)
-                {
-                    Items[itemNumber - 1].Quantity = newQuantity;
-                    Console.WriteLine("Quantity updated.");
-                }
-                else
-                {
-                    // If new quantity is 0 or less, we can consider it as removing the item from the order
-                    RemoveItem(itemNumber);
-                }
+                throw new ArgumentOutOfRangeException("Invalid item number.");
             }
+
+            
+            if (newQuantity > 0)
+            {
+                // newQuantity: has been checked by OrderItem.Quantity setter, so we can directly set it here
+                Items[itemNumber - 1].Quantity = newQuantity;
+                Console.WriteLine("Quantity updated.");
+            }
+            else 
+            {
+                // If new quantity is 0 or less, we can consider it as removing the item from the order
+                RemoveItem(itemNumber);
+            }
+            
         }
 
 		public double CalculateSubtotal()
@@ -189,7 +207,11 @@ namespace POS.Order
 
 		public void PrintInvoice()
 		{
-			Console.WriteLine();
+			if(PaymentMethod == null)
+            {
+                throw new InvalidOperationException("Cannot print invoice without a payment method.");                
+            }
+            Console.WriteLine();
 			Console.WriteLine(GenerateInvoiceText());
 			PaymentMethod.PrintReceipt();
 		}
@@ -198,12 +220,18 @@ namespace POS.Order
 		{
             // TODO
             // Error Handling: If the file cannot be written, catch the exception and display an error message.
-            try
+            if(string.IsNullOrWhiteSpace(filePath))
+			{
+				throw new ArgumentException("File path cannot be empty.");
+			}
+
+			try
             {				 				
                 File.WriteAllText(filePath, GenerateInvoiceText());
                 Console.WriteLine("Invoice saved to file.");
             }
-			catch (Exception ex)
+            // catch: Operating System related exceptions: IOException, UnauthorizedAccessException, etc.
+            catch (Exception ex)
 			{
 				Console.WriteLine($"Error saving file: {ex.Message}");
 			}

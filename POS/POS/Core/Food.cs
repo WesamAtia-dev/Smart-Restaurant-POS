@@ -13,7 +13,17 @@ namespace POS.Core
 
 	class Food : Product
 	{
-		public int Calories { get; set; }
+		private int calories;		
+        public int Calories 
+		{ 
+			get { return calories; }	
+			set 
+			{ 
+				if (value <0)
+					throw new ArgumentOutOfRangeException("Calories cannot be negative.");
+				calories = value;
+            }
+		}
 
 		public Food(string name, double price, int calories)
 			: base(name, price, Category.MainCourse)

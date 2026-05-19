@@ -13,7 +13,17 @@ namespace POS.Core
 	// Add a sugar-based price increase Price + (SugarGrams * 0.002)
 	class Dessert : Product
 	{
-		public int SugarGrams { get; set; }
+		private int sugarGrams;
+        public int SugarGrams 
+		{ 
+			get {  return sugarGrams; }
+			set
+			{
+				if(value < 0)
+                    throw new ArgumentOutOfRangeException("Sugar grams cannot be negative.");
+                sugarGrams = value;
+			}
+		}
 
 		public Dessert(string name, double price, int sugarGrams): base(name, price, Category.Dessert)
 		{
